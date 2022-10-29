@@ -1,8 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <title>Socket.IO chat</title>
     <style>
+        .show {
+            display: block;
+        }
+        .hide {
+            display: none;
+        }
+
         body {
             margin: 0;
             padding-bottom: 3rem;
@@ -60,11 +68,17 @@
     </style>
 </head>
 <body>
-<ul id="messages"></ul>
-<form id="form" action="">
-    <input id="input" autocomplete="off"/>
-    <button>Send</button>
+<form id="username-form" action="" class="show">
+    <input id="name-input" autocomplete="off"/>
+    <button>Save</button>
 </form>
+<div id="chat-box" class="hide">
+    <ul id="messages"></ul>
+    <form id="form" action="">
+        <input id="input" autocomplete="off"/>
+        <button>Send</button>
+    </form>
+</div>
 </body>
 <script src="/socket.io/socket.io.js"></script>
 <script>
@@ -77,16 +91,29 @@
     form.addEventListener('submit', function (e) {
         e.preventDefault();
         if (input.value) {
-            socket.emit('chat message', input.value);
+            socket.emit('chat message', {id: socket.username, msg: input.value});
             input.value = '';
         }
     });
 
     socket.on('chat message', function (msg) {
+        const username = localStorage.getItem('username')
         const item = document.createElement('li');
-        item.textContent = msg;
+        item.textContent = `${username} : ${msg.msg}`;
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
-    })
+    });
+</script>
+<script>
+    const userform = document.getElementById('username-form');
+    const userinput = document.getElementById('name-input');
+
+    userform.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const username = userinput.value;
+        localStorage.setItem("username", username);
+        document.getElementById('username-form').className = 'hide';
+        document.getElementById('chat-box').className = 'show';
+    });
 </script>
 </html>
