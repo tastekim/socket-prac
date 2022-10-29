@@ -88,18 +88,18 @@
     const form = document.getElementById('form');
     let input = document.getElementById('input');
 
+    const username = localStorage.getItem('username');
     form.addEventListener('submit', function (e) {
         e.preventDefault();
         if (input.value) {
-            socket.emit('chat message', {id: socket.username, msg: input.value});
+            socket.emit('chat message', {id: username, msg: input.value});
             input.value = '';
         }
     });
 
     socket.on('chat message', function (msg) {
-        const username = localStorage.getItem('username')
         const item = document.createElement('li');
-        item.textContent = `${username} : ${msg.msg}`;
+        item.textContent = `${msg.id} : ${msg.msg}`;
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
     });
